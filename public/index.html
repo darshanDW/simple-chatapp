@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="index.css">
-    <title>Minimlist chat App</title>
+    <title>Minimalist Chat App</title>
 </head>
 
 <body>
@@ -19,20 +19,23 @@
         </form>
     </div>
     <script type="text/javascript">
-        const wss = new WebSocket(`wss://${window.document.location.host}`);
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wss = new WebSocket(`${protocol}://${window.location.host}`);
         wss.binaryType = "blob";
-        // Log socket opening and closing
+
         wss.addEventListener("open", event => {
-            console.log("Websocket connection opened");
+            console.log("WebSocket connection opened");
         });
+
         wss.addEventListener("close", event => {
-            console.log("Websocket connection closed");
+            console.log("WebSocket connection closed");
         });
-        wss.onmessage = function (message) {
+
+        wss.addEventListener("message", message => {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('msgCtn');
             if (message.data instanceof Blob) {
-                reader = new FileReader();
+                const reader = new FileReader();
                 reader.onload = () => {
                     msgDiv.innerHTML = reader.result;
                     document.getElementById('messages').appendChild(msgDiv);
@@ -43,14 +46,19 @@
                 msgDiv.innerHTML = message.data;
                 document.getElementById('messages').appendChild(msgDiv);
             }
-        }
+        });
+
         const form = document.getElementById('msgForm');
         form.addEventListener('submit', (event) => {
             event.preventDefault();
             const message = document.getElementById('inputBox').value;
-            wss.send(message);
-            document.getElementById('inputBox').value = ''
-        })
+            if (wss.readyState === WebSocket.OPEN) {
+                wss.send(message);
+                document.getElementById('inputBox').value = '';
+            } else {
+                console.error('WebSocket is not open. Message not sent.');
+            }
+        });
     </script>
 </body>
 
