@@ -19,16 +19,16 @@
         </form>
     </div>
     <script type="text/javascript">
-        const ws = new WebSocket(`wss://${window.document.location.host}`);
-        ws.binaryType = "blob";
+        const wss = new WebSocket(`wss://${window.document.location.host}`);
+        wss.binaryType = "blob";
         // Log socket opening and closing
-        ws.addEventListener("open", event => {
+        wss.addEventListener("open", event => {
             console.log("Websocket connection opened");
         });
-        ws.addEventListener("close", event => {
+        wss.addEventListener("close", event => {
             console.log("Websocket connection closed");
         });
-        ws.onmessage = function (message) {
+        wss.onmessage = function (message) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('msgCtn');
             if (message.data instanceof Blob) {
@@ -48,7 +48,7 @@
         form.addEventListener('submit', (event) => {
             event.preventDefault();
             const message = document.getElementById('inputBox').value;
-            ws.send(message);
+            wss.send(message);
             document.getElementById('inputBox').value = ''
         })
     </script>
